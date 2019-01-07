@@ -1,0 +1,73 @@
+digraph sdd {
+
+overlap=false
+
+      n17 [label= "1",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25];
+n17e0
+    [label= "<L>&not;A|<R>B:0.5",
+    shape=record,
+    fontsize=20,
+    fontname="Times-Italic",
+    fillcolor=white,
+    style=filled,
+    fixedsize=false,
+    height=.30];
+
+                                       n17->n17e0 [arrowsize=.50, label="1.0"];
+
+n13 [label= "5",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25];
+n13e0
+    [label= "<L>C:0.5|<R>D:0.5",
+    shape=record,
+    fontsize=20,
+    fontname="Times-Italic",
+    fillcolor=white,
+    style=filled,
+    fixedsize=false,
+    height=.30];
+
+                                       n13->n13e0 [arrowsize=.50, label="1.0"];
+
+n16 [label= "1",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25];
+n16e0
+    [label= "<L>A|<R>B:0.5",
+    shape=record,
+    fontsize=20,
+    fontname="Times-Italic",
+    fillcolor=white,
+    style=filled,
+    fixedsize=false,
+    height=.30];
+
+                                       n16->n16e0 [arrowsize=.50, label="1.0"];
+
+n15 [label= "3",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25];
+n15e0
+    [label= "<L>|<R>",
+    shape=record,
+    fontsize=20,
+    fontname="Times-Italic",
+    fillcolor=white,
+    style=filled,
+    fixedsize=false,
+    height=.30];
+
+                                       n15->n15e0 [arrowsize=.50, label="0.5"];
+n15e0:L:c->n16 [arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n15e0:R:c->n13 [arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n15e1
+    [label= "<L>|<R>",
+    shape=record,
+    fontsize=20,
+    fontname="Times-Italic",
+    fillcolor=white,
+    style=filled,
+    fixedsize=false,
+    height=.30];
+
+                                       n15->n15e1 [arrowsize=.50, label="0.5"];
+n15e1:L:c->n17 [arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n15e1:R:c->n13 [arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+
+
+}

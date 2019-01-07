@@ -1,0 +1,375 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{natbib}
+\usepackage[pdftex]{graphicx}
+\usepackage{enumitem}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{framed}
+
+\setlength{\parskip}{0.5\baselineskip}%
+\setlength{\parindent}{0pt}%
+\setlist[itemize]{noitemsep,nolistsep}
+
+
+\newcommand{\cl}[1]{\begin{framed} #1 \end{framed}}
+\newcommand{\code}[1]{\tt\# #1}
+\newcommand{\out}[1]{\texttt{ #1}}
+\newcommand{\comment}[1]{~~~~~\emph{#1}}
+
+
+%opening
+\title{LearnPsdd Manual}
+\author{Yitao Liang, Jessa Bekker}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Using the PSDD library}
+
+\subsection{Setting up dependencies}
+Add {\tt lib} to {\tt \$LD\_LIBRARY\_PATH} and {\tt \$PATH}:
+
+
+\cl{
+\code{export LD\_LIBRARY\_PATH=\$LD\_LIBRARY\_PATH:lib/}
+
+\code{export PATH=\$PATH:lib/}
+}
+Add this lines to {\tt $\sim$/.bashrc} (or similar) if you want to permanently add it.
+
+Check if metis and blossom are working:
+\cl{
+
+\code{gpmetis}
+
+\out{
+Missing parameters.\newline
+$~~~~$Usage: gpmetis [options] <filename> <nparts>\newline
+$~~~~~~~~~~~~$use 'gpmetis -help' for a summary of the options.
+}
+
+\code{blossom5}
+
+\out{
+Usage: see USAGE.TXT
+}
+}
+
+If a different text ({\it ``No such file or directory''}) is shown, you need to download and compile it yourself, as explained in section~\ref{sec:vtreelib}.
+
+\subsection{Basic commands}
+
+Print possible commands:
+
+\cl{
+\code{java -jar psdd.jar}
+}
+
+\begin{itemize}
+ \item {\tt learnPsdd BU:} bottom-up PSDD structure learning.
+ \item {\tt learnPsdd TD:} top-down PSDD structure learning.
+ \item {\tt learnPsdd search:} PSDD structure search.
+ \item {\tt learnEnsemblePsdd softEM:} structure learning of an ensemble of PSDDs by softEM.
+ \item {\tt sdd2psdd:} PSDD learning by doing parameter learning on an SDD.
+ \item {\tt learnParams:} Learn the parameters of a PSDD.
+ \item {\tt learnVtree:} Learn a vtree from data.
+ \item {\tt paramSearch:} Search for the best parameter calculator for a PSDD. 
+ \item {\tt check:} Check if a PSDD is valid and calculate its likelihoods in two different ways.
+\end{itemize}
+
+By running any of these commands followed by {\tt --help}, you get an explanation of the command and all its possible options. Try for example:
+
+\cl{
+\code{java -jar psdd.jar learnPsdd search --help}
+}
+Most of the options have default values that are good for most settings.
+In the following we introduce what need to be manually set for the the four most used functions: (i) learnVtree; (ii) sdd2psdd; (iii) learnPsdd; (iv)learnEnsemblePsdd. 
+
+learnVtree
+\begin{center}
+ \begin{tabular}{l|l|p{7cm}}
+  Name	& Abbr. &Value \\\hline\hline
+{\tt-d}	& {\tt --trainData}	& *.train.wdata\\\hline
+{\tt-v} &{\tt --vtreeMethod} & the method to learn the vtree. The default is miBlossom. \\\hline
+{\tt-o}	& {\tt --out}		& Output vtree path. For example, if you want your output vtree to be in the folder ``/exampleFolder/" and has the name ``exampleVtree", then here you should put ``/exampleFolder/exampleVtree". By doing so, if the method is chosen to be miBlossom, your vtree would be ``/exampleFolder/exampleVtree\_miBlossom.vtree" \\
+ \end{tabular}
+
+\end{center}
+
+sdd2psdd
+\begin{center}
+ \begin{tabular}{l|l|p{7cm}}
+  Name	& Abbr. &Value \\\hline\hline
+{\tt-v}	& {\tt --vtree}		& Vtree file path, there is a folder with vtrees in the repo. They can be learned with {\tt learnVtree}. \\\hline
+{\tt-d}	& {\tt --trainData}	& *.train.wdata\\\hline
+{\tt-b}	& {\tt --validData}	& *.valid.wdata\\\hline
+{\tt-t}	& {\tt --testData}	& *.test.wdata\\\hline
+{\tt-o}	& {\tt --out}		& Output PSDD path. For example, if you want your output PSDD to be ``/exampleFolder/example.psdd", then here you should put ``/exampleFolder/example.psdd". \\\hline
+{\tt-m}	& {\tt --smooth}	& Smoothing type, l-1 (Laplace smoothing) is usually a good one.\\\hline
+{\tt-s} & {\tt --sdd} & The sdd file where parameter leaning is performed upon. \\
+ \end{tabular}
+
+\end{center}
+
+
+learnPsdd
+\begin{center}
+ \begin{tabular}{l|l|p{7cm}}
+  Name	& Abbr. &Value \\\hline\hline
+{\tt-v}	& {\tt --vtree}		& Vtree file path, there is a folder with vtrees in the repo. They can be learned with {\tt learnVtree}. \\\hline
+{\tt-d}	& {\tt --trainData}	& *.train.wdata\\\hline
+{\tt-b}	& {\tt --validData}	& *.valid.wdata\\\hline
+{\tt-t}	& {\tt --testData}	& *.test.wdata\\\hline
+{\tt-o}	& {\tt --out}		& Output folder path, this should be an empty folder because multiple output files are created.\\\hline
+{\tt-m}	& {\tt --smooth}	& Smoothing type, l-1 (Laplace smoothing) is usually a good one.\\\hline
+{\tt-p}	& {\tt --psdd}		& Optional: Psdd file path. If a psdd is provided, then this is a base for learning, otherwise the learning is started from a PSDD with independent variables. To learn on top of constraints, the constraints in SDD format can be converted to a PSDD with {\tt sdd2psdd}.\\
+ \end{tabular}
+ \end{center}
+ 
+ \clearpage
+ learnEnsemblePsdd softEM
+\begin{center}
+ \begin{tabular}{l|l|p{7cm}}
+  Name	& Abbr. &Value \\\hline\hline
+{\tt-v}	& {\tt --vtree}		& Vtree file path, there is a folder with vtrees in the repo. They can be learned with {\tt learnVtree}. \\\hline
+{\tt-d}	& {\tt --trainData}	& *.train.wdata\\\hline
+{\tt-b}	& {\tt --validData}	& *.valid.wdata\\\hline
+{\tt-t}	& {\tt --testData}	& *.test.wdata\\\hline
+{\tt-o}	& {\tt --out}		& Output folder path, this should be an empty folder because multiple output files are created.\\\hline
+{\tt-c} & {\tt --numComponentLearners} & The number of component learners used to construct the ensemble. \\\hline
+{\tt-m}	& {\tt --smooth}	& Smoothing type, l-1 (Laplace smoothing) is usually a good one.\\\hline
+{\tt-p}	& {\tt --psdd}		& Optional: Psdd file path. If a psdd is provided, then this is a base for learning, otherwise the learning is started from a PSDD with independent variables. To learn on top of constraints, the constraints in SDD format can be converted to a PSDD with {\tt sdd2psdd}.\\
+ \end{tabular}
+
+\end{center}
+
+
+
+\subsubsection{Hidden commands}
+There are two hidden commands that are useful during development: {\tt scratch} and {\tt assertTest}. The former executes the code in the scratch space in the Main.scala file. The latter checks if assertions are on or off.
+
+\cl{
+\code{java -jar psdd.jar scratch}
+
+\comment{Scratch output}
+
+\code{java -jar psdd.jar assertTest}
+
+\out{assertions are on}
+
+\comment{or}
+
+\out{assertions are off}
+}
+
+
+\subsection{SBT}
+
+The scala build tool (SBT) is used for compiling, dependency management and jar creation. It can also be used to run and test the code. But it is recommended only to use it like this during development but to use the jar for actual usage. Any sbt command compiles the code first, so there is no need to do this explicitely.
+
+To run the code, use the command {\tt sbt ``run \emph{parameters}''}. For example:
+
+\cl{
+
+\code{sbt ``run scratch''}
+
+\comment {Scratch output}
+
+\code{sbt ``run learnPsdd search -d pathToDatasets/nltcs.train.wdata -b pathToDatasets/nltcs.valid.wdata -t pathToDatasets/nltcs.test.wdata -v vtrees/nltcs\_miBlossom.vtree -m l-1 -o nltcsOut''}
+
+\comment{Psdd structure learning}
+}
+
+
+To test the code, run:
+\cl{
+\code{sbt test}
+}
+
+To build a jar, run:
+\cl{
+\code{sbt assembly}
+}
+This wil create the psdd.jar file in the folder {\tt target/scala-2.11/}.
+
+All the build settings are defined in {\tt build.sbt}. In this file assertions can be turned on or off by commenting one of the ``scalaOptions'' lines.
+
+\subsection{Running experiments}
+When you use the code to run experiments, remember to:
+\begin{itemize}
+ \item Turn off assertions: this is a lot of unnecessary overhead.
+ \item Use the jar, running through sbt also creates overhead.
+\end{itemize}
+
+\subsection{Output}
+
+Structure learning generates multiple output files:
+
+\begin{itemize}
+ \item {\tt out/progress.csv} keeps the learning progress. For each iteration, it saves the size, log likelihoods, and timings.
+ \item {\tt out/cmd} saves the command that was used to start this learning.
+ \item {\tt out/out} is unused for now
+ \item {\tt out/models} contains the models learned. It saves the psdd, vtree and dot file.
+ \item {\tt out/debug} contains debug information.
+\end{itemize}
+
+
+\subsection{File formats}
+We use the same file formats as the SDD library.
+
+\paragraph{Data} files have no header and one line per (unique) example. An example is a comma seperated list  of zeros and ones. If it only contains unique examples, then the line is preceded by a weight and a bar. For example, the following snippet contains 3 unique examples, 14 in total and has 8 variables:
+
+\begin{verbatim}
+ 8|1,1,0,1,0,1,0,0
+ 4|0,1,1,1,0,1,0,1
+ 2|0,0,0,0,1,0,1,0
+\end{verbatim}
+
+\paragraph{PSDD} files are similar to SDD files. They start with the number of nodes and all the following lines are nodes that appear bottom-up. There are three types of nodes:
+\begin{itemize}
+ \item {\bf Literals:} L id-of-literal-sdd-node literal
+ \item {\bf True nodes:} T id-of-true-sdd-node id-of-vtree trueNode variable log(litProb)
+ \item {\bf Decomposition nodes:} D id-of-decomposition-sdd-node id-of-vtree number-of-elements {id-of-prime id-of-sub log(elementProb)}*
+\end{itemize}
+We do not require the id's to start at 0 nor to be in order. This is for debugging purpose, so that we can map prints to the saved PSDDs.
+
+
+\section{Dependencies}
+
+Most of the dependencies are automatically added by {\tt sbt} by either downloading the library or getting it from {\tt lib/}. However, the {\tt \$LD\_LIBRARY\_PATH} and {\tt \$PATH} need to set manually by adding {\tt lib/} to it. You may need to compile {\tt gpmetis} and {\tt blossom5} yourself.
+
+\subsection{The SDD library}
+The SDD library is used by the PSDDs to represent their internal formulas. For this purpose we use the {\tt JSDD} Java wrapper of the original SDD C library. The required files are:
+\begin{itemize}
+ \item {\tt JSDD.jar:} The Java library, in {\tt java.library.path}. This is set automatically by {\tt sbt}.
+ \item {\tt libsdd.so:} The original SDD C library, in {\tt \$LD\_LIBRARY\_PATH}.  This is \emph{not} done automatically.
+ \item {\tt libsdd\_wrap.so:} The native bridge between Java and C, in \\ {\tt \$LD\_LIBRARY\_PATH}.  This is \emph{not} done automatically.
+\end{itemize}
+
+\subsection{Libraries for learning vtrees}
+\label{sec:vtreelib}
+To learn vtrees, graph abstractions are used. For top-down learning, we use graph partitioning which is implemented by the {\tt metis} library. For bottom-up learning, we use {\tt blossom V}. Both libraries are called through system commands, therefore we need them in the {\tt \$PATH}. This is \emph{not} done automatically.
+
+Compiled versions of the libraries can be found in the {\tt lib/} folder. However, they might not be right for your machine. If this is the case, you need to download them and follow their compilation instructions to compile them. The websites are:
+
+\begin{itemize}
+ \item \url{http://glaros.dtc.umn.edu/gkhome/views/metis}
+ \item \url{http://pub.ist.ac.at/~vnk/software.html}
+\end{itemize}
+
+Once they are compiled, the binaries in the {\tt lib} folder are to replaced with the newly compiled ones:
+\begin{itemize}
+ \item \tt \emph{metisFolder}/build/Linux-x86\_64/programs/gpmetis
+ \item \tt \emph{blossomFolder}/blossom5
+\end{itemize}
+
+
+\subsection{Other libraries}
+Three external Java libraries are used: 
+\begin{itemize}
+ \item {\tt Guava:} to implement the PSDD node cache.
+ \item {\tt Scopt:} to parse the command line options
+ \item {\tt Junit:} for unit testing
+\end{itemize}
+
+These libraries are automatically downloaded from their Maven repositories by {\tt sbt}.
+
+
+
+\section{Understanding the code}
+To help understanding the code, we briefly explain all classes below and then explain the code flow of PSDD structure learning.
+
+\subsection{Classes}
+\subsubsection{PSDD structure and operations}
+
+\paragraph{PsddNode} is the core class for the PSDD structure. It is the super class for any type of PSDD node.
+
+\paragraph{PsddElement} is the element of a PSDD. Originally this was a triple: (prime, sub, $\theta$). Here it is extended with the data of that element and it internal formula.
+
+\paragraph{VtreeNode} is the core class for the Vtree structure. It is the super class for any type of Vtree node.
+
+\paragraph{PsddManager} manages PSDD operations that affect their structure while keeping them valid and avoiding redundancy by keeping a node cache. Its public methods are:
+\begin{itemize}
+ \item {\tt newPsdd} constructs a new PSDD that represents a distribution over independent variables
+ \item {\tt readPsdd} reads a PSDD
+ \item {\tt readPsddFromSdd} reads an SDD to a PSDD
+ \item {\tt executeSplit} splits a PSDD element
+ \item {\tt simulateSplit} simulates a split and calculates the potential log likelihood gain and number of added edges
+ \item {\tt executeClone} clones a PSDD node
+ \item {\tt simulateClone} simulates a clone and calculates the potential log likelihood gain and number of added edges
+ \item {\tt calculateParameters} calculates the parameters of a PSDD given a parameter calculator
+\end{itemize}
+
+
+\paragraph{PsddQueries} executes operations on a PSDD that do not affect their structure, such as:
+\begin{itemize}
+ \item log likelihood
+ \item size
+ \item entropy
+ \item probability of a partial variable assignment
+ \item checking if a node is valid
+ \item saving as PSDD, SDD or DOT file.
+ \item getting all the nodes or elements of a PSDD in a certain order
+\end{itemize}
+
+
+\paragraph{Data} represents the data efficiently as a bitset. It allows multiple operations.
+
+\subsubsection{Algorithms}
+These are the core classes for the PSDD structure learning and vtree learning:
+
+\paragraph{Learner} is the main class for learning the structure of PSDDs
+
+\paragraph{OperationQueue} keeps the best operation for each PSDD node. The operations are ordered on their quality. It also updates the queue when the structure of the PSDD is changed.
+
+\paragraph{OperationFinder} finds the best operation for a certain PSDD node by simulating possible operations on it.
+
+\paragraph{VtreeLearner} learns the vtrees.
+
+
+\subsubsection{Small calculations and keeping information}
+\paragraph{ParameterCalculator} calculates parameters. There are multiple implementations.
+
+\paragraph{OperationScorer} scores an operation based on the resulting log likelihood gain and added edges.
+
+\paragraph{Constraint} represents a formula that can be used to split on. It allows several calculations such as the model count of a node restricted to this formula.
+
+\paragraph{SaveFrequency} specifies when a model should be saved (each $k$ iterations and always or only keeping the best models)
+
+\paragraph{OperationCompletionType} specifies how a split or clone operation should be completed (minimal, complete, maximum $k$ edges, maximum $k$ depth)
+
+\paragraph{CloneSpecification} specifies how a node should be cloned. The manager puts this in PSDD nodes as bookkeeping during a clone operation (that involves multiple nodes).
+
+\paragraph{PsddOperation} represents a split or clone operation. It calls the methods of the manager.
+
+\paragraph{SingleNodeOperation} keeps an operation and some stats (score, delta size, delta log likelihood). It is used to keep operations in the operation queue.
+
+
+\subsubsection{Administration}
+\paragraph{Main} parses the input and calls the disired classes.
+
+\paragraph{Output} manages all the output. E.g.: saving a psdd (as vtree, psdd and dot) or writing something to a debug or output file.
+
+\subsection{Code flow}
+
+The code is entered through {\tt Main} that parses the input and then calls the {\tt Learner}.
+
+The {\tt Learner} repeatedly tells the {\tt OperationQueue} to update itself and return the next best {\tt PsddOperation} to then execute the operation.
+
+To update itself, the {\tt OperationQueue} checks which nodes were affected by the last operation makes a new {\tt SingleNodeOperation} for it. It sorts the operations based on their score. A {\tt SingleNodeOperation} gets it's concrete operation by asking the {\tt OperationFinder} to find the best {\tt PsddOperation} for that node.
+
+The {\tt OperationFinder} finds the best {\tt PsddOperation} for a node by simulating multiple operations and selecting the best one using the {\tt OperationScorer}. To find splits, for every element of a node, it recursively updates a lists of {\tt Constraint}s on that element, by splitting the constraint into two mutually exclusive that together are equal to the original constraint. It starts from {\tt NoConstraint} and updates them by conditioning on a variable. This algorithm is similar to decision tree learning. To find clones, it tries different subsets of the parents to make the clone for.
+
+The {\tt PsddOperation} executes and simulates operations by calling the {\tt PsddManager}. It passes a {\tt ParameterCalculator} along so that the manager knows how to calculate the parameters.
+
+
+\end{document}
